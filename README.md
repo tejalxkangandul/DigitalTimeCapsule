@@ -1,22 +1,24 @@
-Digital Time Capsule (Simple JavaScript Full-Stack)
+**Digital Time Capsule (JavaScript Full-Stack)**
 
-A simple web application allowing users to register, log in, and write messages (time capsules) to be viewed in the future. Capsules are stored per user in a MongoDB database.
+-- A simple web application allowing users to register, log in, and write messages (time capsules) to be viewed in the future. Capsules are stored per user in a MongoDB database.
 
-This version uses a simple Node.js/Express backend and a single HTML file frontend with vanilla JavaScript and Tailwind CSS.
+-- This version uses a simple Node.js/Express backend and a single HTML file frontend with vanilla JavaScript and Tailwind CSS.
 
-Features
 
-User registration and login (basic, insecure).
+**Features**
 
-Create time capsules with a message and a future reveal date.
+-- User registration and login (basic, insecure).
 
-View a list of sealed capsules associated with the logged-in user.
+-- Create time capsules with a message and a future reveal date.
 
-Data persistence using MongoDB.
+-- View a list of sealed capsules associated with the logged-in user.
 
-Futuristic UI theme with an animated starfield background.
+-- Data persistence using MongoDB.
 
-Technology Stack
+-- Futuristic UI theme with an animated starfield background.
+
+
+**Technology Stack**
 
 Frontend: HTML, CSS (Tailwind CSS via CDN), Vanilla JavaScript (fetch API)
 
@@ -26,7 +28,8 @@ Database: MongoDB (using the official mongodb driver)
 
 Other: cors Node.js package for handling Cross-Origin Resource Sharing.
 
-File Structure
+
+**File Structure**
 
 timeCapsule/
 ├── backend/ <-- Node.js Backend Code
@@ -38,13 +41,15 @@ timeCapsule/
 └── frontend/ <-- HTML Frontend Code
 └── index.html <-- Single HTML file containing structure, styling, and client-side JS
 
-Prerequisites
+
+**Prerequisites**
 
 Node.js and npm: Download and install from nodejs.org.
 
 MongoDB: A running MongoDB instance. You can install it locally or use a cloud service like MongoDB Atlas. Ensure the server is running.
 
-Setup and Running
+
+**Setup and Running**
 
 You need to run the backend server and open the frontend file separately.
 
@@ -80,8 +85,10 @@ Double-click the index.html file (or right-click and "Open with" your preferred 
 
 The application should now open in your browser and connect to the running backend.
 
-Important Notes
+
+**Important Notes**
 
 Security: This version is highly simplified for learning purposes. It does not implement secure password hashing or session management. Passwords are stored and compared in plain text. Do not use this for any real-world application.
 
 Email Sending: This version does not actually send emails when capsules are due. That functionality would need to be added to the backend (e.g., using a library like Nodemailer and a scheduled job runner).
+
