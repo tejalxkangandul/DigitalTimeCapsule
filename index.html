@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Time Capsule</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Orbitron font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Define the star animation */
+      @keyframes moveStars {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: -10000px 5000px;
+        } /* Adjust values for speed/direction */
+      }
+
+      /* Starfield layers */
+      .stars {
+        background-color: #111827; /* Dark base */
+        background-image: radial-gradient(
+            1px 1px at 20px 30px,
+            #eee,
+            rgba(0, 0, 0, 0)
+          ),
+          /* Small stars */
+            radial-gradient(1px 1px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+          radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
+          /* Medium stars */
+            radial-gradient(2px 2px at 130px 80px, #fff, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0, 0, 0, 0));
+        background-repeat: repeat;
+        background-size: 200px 200px; /* Size of the repeating star pattern */
+        animation: moveStars 200s linear infinite; /* Apply animation - adjust duration for speed */
+        height: 100%;
+        position: fixed; /* Use fixed to cover viewport */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -2; /* Place behind overlay */
+      }
+      .stars2 {
+        /* Second layer, moving slightly different */
+        background-color: transparent; /* No base color needed */
+        background-image: radial-gradient(
+            1px 1px at 70px 20px,
+            #eee,
+            rgba(0, 0, 0, 0)
+          ),
+          radial-gradient(1px 1px at 100px 100px, #fff, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 10px 150px, #ddd, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 180px 180px, #fff, rgba(0, 0, 0, 0));
+        background-repeat: repeat;
+        background-size: 300px 300px; /* Different size for parallax */
+        animation: moveStars 300s linear infinite reverse; /* Different duration and direction */
+        height: 100%;
+        position: fixed; /* Use fixed to cover viewport */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -2;
+      }
+
+      /* Removed video background CSS */
+
+      /* Apply Orbitron to headings, Inter to body text */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #111827; /* Fallback dark background */
+        color: #d1d5db; /* Default light gray text */
+        position: relative; /* Needed for the ::before overlay */
+        z-index: 1; /* Ensure body content is above background */
+        min-height: 100vh; /* Ensure body takes full height */
+      }
+      /* Dark overlay for readability */
+      body::before {
+        content: "";
+        position: fixed; /* Use fixed to cover viewport */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.65); /* Dark semi-transparent overlay */
+        z-index: -1; /* Place behind content but above star divs */
+      }
+
+      h1,
+      h2,
+      button {
+        font-family: "Orbitron", sans-serif;
+      }
+      .capsule-item {
+        border-left: 4px solid #3b82f6; /* Keep blue border */
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        background-color: rgba(
+          31,
+          41,
+          55,
+          0.8
+        ); /* Slightly transparent item background */
+        backdrop-filter: blur(2px); /* Add a slight blur effect behind items */
+      }
+      .capsule-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); /* Subtle blue glow on hover */
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .error-message {
+        color: #f87171;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        text-align: center;
+      }
+
+      /* Custom input styles for dark theme */
+      input[type="email"],
+      input[type="password"],
+      input[type="date"],
+      textarea {
+        background-color: rgba(
+          55,
+          65,
+          81,
+          0.8
+        ); /* Slightly transparent input */
+        border: 1px solid #4b5563;
+        color: #d1d5db;
+        backdrop-filter: blur(1px);
+      }
+      input::placeholder,
+      textarea::placeholder {
+        color: #9ca3af; /* Lighter placeholder */
+      }
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* Blue focus ring */
+      }
+
+      /* Neon Button Effect */
+      .btn-neon {
+        box-shadow: 0 0 5px theme("colors.blue.500"),
+          0 0 10px theme("colors.blue.600");
+        transition: background-color 0.2s ease-in-out,
+          box-shadow 0.2s ease-in-out;
+      }
+      .btn-neon:hover {
+        box-shadow: 0 0 10px theme("colors.blue.400"),
+          0 0 20px theme("colors.blue.500");
+      }
+      .btn-neon-red {
+        box-shadow: 0 0 5px theme("colors.red.500"),
+          0 0 10px theme("colors.red.600");
+        transition: background-color 0.2s ease-in-out,
+          box-shadow 0.2s ease-in-out;
+      }
+      .btn-neon-red:hover {
+        box-shadow: 0 0 10px theme("colors.red.400"),
+          0 0 20px theme("colors.red.500");
+      }
+      .btn-neon-green {
+        box-shadow: 0 0 5px theme("colors.green.500"),
+          0 0 10px theme("colors.green.600");
+        transition: background-color 0.2s ease-in-out,
+          box-shadow 0.2s ease-in-out;
+      }
+      .btn-neon-green:hover {
+        box-shadow: 0 0 10px theme("colors.green.400"),
+          0 0 20px theme("colors.green.500");
+      }
+
+      /* Message Box Dark Theme */
+      #message-box {
+        background-color: #10b981; /* Default green */
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
+      #message-box.error {
+        background-color: #ef4444; /* Red for errors */
+      }
+
+      /* Main content container styling */
+      .content-container {
+        background-color: rgba(
+          17,
+          24,
+          39,
+          0.8
+        ); /* Semi-transparent dark background */
+        backdrop-filter: blur(5px); /* Stronger blur for the main container */
+        max-height: calc(100vh - 10rem); /* Adjust based on title/padding */
+        overflow-y: auto;
+        /* Custom scrollbar for webkit browsers */
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+        &::-webkit-scrollbar-track {
+          background: #1f2937;
+          border-radius: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+          background-color: #4b5563;
+          border-radius: 4px;
+          border: 2px solid #1f2937;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+          background-color: #6b7280;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen flex flex-col items-center pt-10 px-4 text-gray-300"
+  >
+    <!-- Removed background video tag -->
+    <!-- Add back the divs for animated star layers -->
+    <div class="stars"></div>
+    <div class="stars2"></div>
+
+    <!-- Main Title -->
+    <h1
+      class="text-4xl font-bold text-center text-blue-400 mb-8 tracking-wider relative z-10"
+    >
+      Digital Time Capsule
+    </h1>
+
+    <!-- Main container updated styles -->
+    <div
+      class="w-full max-w-2xl rounded-lg shadow-xl p-8 border border-gray-700 relative z-10 content-container"
+    >
+      <!-- Login Page -->
+      <div id="login-page" class="page active">
+        <h2
+          class="text-2xl font-bold text-center text-blue-400 mb-6 tracking-wider"
+        >
+          Login
+        </h2>
+        <form id="login-form" class="mb-4">
+          <div class="mb-4">
+            <label
+              for="login-email"
+              class="block text-gray-400 text-sm font-bold mb-2"
+              >Email:</label
+            >
+            <input
+              type="email"
+              id="login-email"
+              class="appearance-none rounded w-full py-2 px-3 leading-tight"
+              required
+            />
+          </div>
+          <div class="mb-6">
+            <label
+              for="login-password"
+              class="block text-gray-400 text-sm font-bold mb-2"
+              >Password:</label
+            >
+            <input
+              type="password"
+              id="login-password"
+              class="appearance-none rounded w-full py-2 px-3 leading-tight"
+              required
+            />
+          </div>
+          <p id="login-error" class="error-message mb-4"></p>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-neon"
+          >
+            Login
+          </button>
+        </form>
+        <p class="text-center text-gray-500 text-sm">
+          Don't have an account?
+          <a
+            href="#"
+            id="show-register"
+            class="text-blue-400 hover:text-blue-300"
+            >Register here</a
+          >
+        </p>
+      </div>
+
+      <!-- Register Page -->
+      <div id="register-page" class="page">
+        <h2
+          class="text-2xl font-bold text-center text-green-400 mb-6 tracking-wider"
+        >
+          Register
+        </h2>
+        <p class="text-center text-gray-500 text-sm mb-4">
+          Capsules will be associated with this email.
+        </p>
+        <form id="register-form" class="mb-4">
+          <div class="mb-4">
+            <label
+              for="register-email"
+              class="block text-gray-400 text-sm font-bold mb-2"
+              >Email:</label
+            >
+            <input
+              type="email"
+              id="register-email"
+              class="appearance-none rounded w-full py-2 px-3 leading-tight"
+              required
+            />
+          </div>
+          <div class="mb-6">
+            <label
+              for="register-password"
+              class="block text-gray-400 text-sm font-bold mb-2"
+              >Password:</label
+            >
+            <input
+              type="password"
+              id="register-password"
+              class="appearance-none rounded w-full py-2 px-3 leading-tight"
+              required
+            />
+          </div>
+          <p id="register-error" class="error-message mb-4"></p>
+          <button
+            type="submit"
+            class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-neon-green"
+          >
+            Register
+          </button>
+        </form>
+        <p class="text-center text-gray-500 text-sm">
+          Already have an account?
+          <a href="#" id="show-login" class="text-blue-400 hover:text-blue-300"
+            >Login here</a
+          >
+        </p>
+      </div>
+
+      <!-- Main App Page (Time Capsule) -->
+      <div id="app-page" class="page">
+        <div
+          class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4"
+        >
+          <p class="text-gray-400">
+            Welcome,
+            <span
+              id="user-email-display"
+              class="font-semibold text-blue-300"
+            ></span
+            >!
+          </p>
+          <button
+            id="logout-button"
+            class="bg-red-600 hover:bg-red-500 text-white text-sm font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline btn-neon-red"
+          >
+            Logout
+          </button>
+        </div>
+
+        <form
+          id="capsule-form"
+          class="mb-8 p-6 bg-gray-900 rounded-lg border border-gray-700"
+        >
+          <div class="mb-4">
+            <label
+              for="message"
+              class="block text-gray-400 text-sm font-bold mb-2"
+              >Your Message:</label
+            >
+            <textarea
+              id="message"
+              rows="4"
+              class="appearance-none rounded w-full py-2 px-3 leading-tight"
+              placeholder="Write something for the future..."
+              required
+            ></textarea>
+          </div>
+          <div class="mb-6">
+            <label
+              for="revealDate"
+              class="block text-gray-400 text-sm font-bold mb-2"
+              >Reveal Date:</label
+            >
+            <input
+              type="date"
+              id="revealDate"
+              class="appearance-none rounded w-full py-2 px-3 leading-tight"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-neon"
+          >
+            Seal Capsule
+          </button>
+        </form>
+
+        <div>
+          <h2 class="text-2xl font-semibold text-blue-300 mb-4 tracking-wide">
+            Sealed Capsules
+          </h2>
+          <div id="capsule-list" class="space-y-4">
+            <p id="no-capsules-message" class="text-gray-500 italic">
+              No capsules sealed yet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Box (styling updated) -->
+    <div
+      id="message-box"
+      class="fixed bottom-4 right-4 text-white p-3 rounded-lg shadow-lg hidden transition-opacity duration-300 z-20"
+    >
+      <!-- Ensure message box is on top -->
+      <!-- Message set by JS -->
+    </div>
+
+    <script>
+      // --- Page Elements ---
+      const loginPage = document.getElementById("login-page");
+      const registerPage = document.getElementById("register-page");
+      const appPage = document.getElementById("app-page");
+      const pages = [loginPage, registerPage, appPage];
+
+      // --- Auth Form Elements ---
+      const loginForm = document.getElementById("login-form");
+      const registerForm = document.getElementById("register-form");
+      const loginEmailInput = document.getElementById("login-email");
+      const loginPasswordInput = document.getElementById("login-password");
+      const registerEmailInput = document.getElementById("register-email");
+      const registerPasswordInput =
+        document.getElementById("register-password");
+      const loginError = document.getElementById("login-error");
+      const registerError = document.getElementById("register-error");
+      const showRegisterLink = document.getElementById("show-register");
+      const showLoginLink = document.getElementById("show-login");
+      const logoutButton = document.getElementById("logout-button");
+      const userEmailDisplay = document.getElementById("user-email-display");
+
+      // --- Capsule Form Elements ---
+      const capsuleForm = document.getElementById("capsule-form");
+      const messageInput = document.getElementById("message");
+      const revealDateInput = document.getElementById("revealDate");
+      const capsuleList = document.getElementById("capsule-list");
+      const noCapsulesMessage = document.getElementById("no-capsules-message");
+      const messageBox = document.getElementById("message-box");
+
+      // --- Backend API Base URL ---
+      const API_BASE_URL = "http://localhost:8080/api"; // Your Node.js backend URL
+
+      let currentUser = null; // Store { id: '...', email: '...' } of the logged-in user
+
+      // --- Page Navigation ---
+      function showPage(pageId) {
+        pages.forEach((page) => {
+          page.classList.toggle("active", page.id === pageId);
+        });
+      }
+
+      showRegisterLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        clearErrors();
+        showPage("register-page");
+      });
+      showLoginLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        clearErrors();
+        showPage("login-page");
+      });
+      logoutButton.addEventListener("click", logout);
+
+      function clearErrors() {
+        loginError.textContent = "";
+        registerError.textContent = "";
+      }
+
+      // --- Authentication Logic (using fetch) ---
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const email = registerEmailInput.value.trim();
+        const password = registerPasswordInput.value;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!response) {
+            throw new TypeError("Network response was not received.");
+          }
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              errorText || `HTTP error! Status: ${response.status}`
+            );
+          }
+
+          showMessage("Registration successful! Please login.");
+          registerForm.reset();
+          showPage("login-page");
+        } catch (error) {
+          console.error("Registration Error:", error);
+          if (error instanceof TypeError) {
+            registerError.textContent =
+              "Could not connect to the server. Please ensure it is running.";
+          } else {
+            registerError.textContent =
+              error.message || "Registration failed. Please try again.";
+          }
+        }
+      });
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const email = loginEmailInput.value.trim();
+        const password = loginPasswordInput.value;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!response) {
+            throw new TypeError("Network response was not received.");
+          }
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              errorText || `HTTP error! Status: ${response.status}`
+            );
+          }
+          const userData = await response.json();
+          login(userData);
+        } catch (error) {
+          console.error("Login Error:", error);
+          if (error instanceof TypeError) {
+            loginError.textContent =
+              "Could not connect to the server. Please ensure it is running.";
+          } else {
+            loginError.textContent =
+              error.message || "Login failed. Please try again.";
+          }
+        }
+      });
+
+      function login(userData) {
+        if (!userData || !userData.id || !userData.email) {
+          console.error("Invalid user data received from login:", userData);
+          loginError.textContent =
+            "Login failed: Invalid data received from server.";
+          return;
+        }
+        currentUser = userData;
+        sessionStorage.setItem(
+          "timeCapsuleCurrentUser",
+          JSON.stringify(userData)
+        );
+        userEmailDisplay.textContent = currentUser.email;
+        loginForm.reset();
+        showPage("app-page");
+        loadCapsules();
+      }
+
+      function logout() {
+        currentUser = null;
+        sessionStorage.removeItem("timeCapsuleCurrentUser");
+        showPage("login-page");
+        capsuleList.innerHTML = "";
+        noCapsulesMessage.style.display = "block";
+        capsuleList.appendChild(noCapsulesMessage);
+      }
+
+      // --- Capsule Logic (using fetch) ---
+      async function loadCapsules() {
+        if (!currentUser || !currentUser.id) return;
+
+        capsuleList.innerHTML = "";
+        noCapsulesMessage.style.display = "block";
+        capsuleList.appendChild(noCapsulesMessage);
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/capsules/user/${currentUser.id}`
+          );
+          if (!response) {
+            throw new TypeError("Network response was not received.");
+          }
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const capsules = await response.json();
+
+          if (capsules.length === 0) {
+            noCapsulesMessage.style.display = "block";
+          } else {
+            noCapsulesMessage.style.display = "none";
+            capsules.sort(
+              (a, b) => new Date(a.revealDate) - new Date(b.revealDate)
+            );
+            capsules.forEach(addCapsuleToList);
+          }
+        } catch (error) {
+          console.error("Error loading capsules:", error);
+          let msg = "Could not load capsules.";
+          if (error instanceof TypeError) {
+            msg = "Could not load capsules: Cannot connect to server.";
+          } else {
+            msg = `Could not load capsules: ${error.message}`;
+          }
+          showMessage(msg, true); // Show error message
+        }
+      }
+
+      function addCapsuleToList(capsule) {
+        if (noCapsulesMessage.style.display !== "none") {
+          noCapsulesMessage.style.display = "none";
+        }
+
+        const capsuleElement = document.createElement("div");
+        capsuleElement.className = "capsule-item p-4 rounded-md shadow"; // Removed bg-gray-50 for consistency
+
+        const messageParagraph = document.createElement("p");
+        messageParagraph.className = "text-gray-300 italic mb-2 break-words"; // Lighter text for message
+        messageParagraph.textContent = `"${capsule.message}"`;
+
+        const dateParagraph = document.createElement("p");
+        dateParagraph.className = "text-gray-500 text-sm text-right"; // Darker text for date
+        const revealDate = new Date(capsule.revealDate);
+        dateParagraph.textContent = `Sealed until: ${revealDate.toLocaleDateString()}`;
+
+        capsuleElement.appendChild(messageParagraph);
+        capsuleElement.appendChild(dateParagraph);
+        capsuleList.appendChild(capsuleElement);
+      }
+
+      // Updated showMessage to handle error state
+      function showMessage(text, isError = false) {
+        messageBox.textContent = text;
+        messageBox.classList.remove("hidden", "opacity-0");
+        messageBox.classList.add("opacity-100");
+        if (isError) {
+          messageBox.classList.add("error"); // Add error class for red background
+        } else {
+          messageBox.classList.remove("error"); // Ensure it's green for success
+        }
+
+        setTimeout(() => {
+          messageBox.classList.remove("opacity-100");
+          messageBox.classList.add("opacity-0");
+          setTimeout(() => {
+            messageBox.classList.add("hidden");
+            messageBox.classList.remove("error"); // Clean up error class
+          }, 300);
+        }, 2000); // Show message for 2 seconds
+      }
+
+      capsuleForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!currentUser || !currentUser.id) return;
+
+        const message = messageInput.value.trim();
+        const revealDate = revealDateInput.value;
+
+        if (!message || !revealDate) {
+          showMessage("Please enter message and date.", true);
+          return;
+        }
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(revealDate);
+        const timezoneOffset = selectedDate.getTimezoneOffset() * 60000;
+        const adjustedSelectedDate = new Date(
+          selectedDate.getTime() + timezoneOffset
+        );
+
+        if (adjustedSelectedDate <= today) {
+          showMessage("Please select a future date.", true);
+          return;
+        }
+
+        const newCapsuleData = {
+          userId: currentUser.id,
+          message: message,
+          revealDate: revealDate,
+        };
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/capsules`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newCapsuleData),
+          });
+
+          if (!response) {
+            throw new TypeError("Network response was not received.");
+          }
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              errorText || `HTTP error! Status: ${response.status}`
+            );
+          }
+
+          loadCapsules(); // Reload list
+          messageInput.value = "";
+          revealDateInput.value = "";
+          showMessage("Capsule sealed successfully!");
+        } catch (error) {
+          console.error("Error saving capsule:", error);
+          let msg = "Failed to save capsule.";
+          if (error instanceof TypeError) {
+            msg = "Failed to save capsule: Cannot connect to server.";
+          } else {
+            msg = `Failed to save capsule: ${error.message}`;
+          }
+          showMessage(msg, true);
+        }
+      });
+
+      // --- Check if user is logged in on page load ---
+      const storedUser = sessionStorage.getItem("timeCapsuleCurrentUser");
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          if (userData && userData.id && userData.email) {
+            login(userData);
+          } else {
+            console.warn("Invalid user data in sessionStorage, clearing.");
+            sessionStorage.removeItem("timeCapsuleCurrentUser");
+            showPage("login-page");
+          }
+        } catch (e) {
+          console.error("Error parsing user data from sessionStorage:", e);
+          sessionStorage.removeItem("timeCapsuleCurrentUser");
+          showPage("login-page");
+        }
+      } else {
+        showPage("login-page");
+      }
+    </script>
+  </body>
+</html>
