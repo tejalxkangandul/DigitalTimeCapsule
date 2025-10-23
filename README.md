@@ -34,13 +34,20 @@ Other: cors Node.js package for handling Cross-Origin Resource Sharing.
 timeCapsule/
 
 ├── backend/ <-- Node.js Backend Code
+
 │ ├── node_modules/ <-- Installed dependencies (created by npm install)
+
 │ ├── package.json <-- Project definition and dependencies
+
 │ ├── package-lock.json <-- Lockfile for dependency versions
+
 │ └── server.js <-- Main backend server logic (Express, MongoDB connection)
+
 │
 └── frontend/ <-- HTML Frontend Code
+
 └── index.html <-- Single HTML file containing structure, styling, and client-side JS
+
 
 
 **Prerequisites**
@@ -56,35 +63,35 @@ You need to run the backend server and open the frontend file separately.
 
 1. Set up the Backend:
 
-Open a terminal or command prompt.
+  Open a terminal or command prompt.
 
-Navigate to the backend directory:
+  Navigate to the backend directory:
 
-cd path/to/your/project/backend_simple
+    cd path/to/your/project/backend_simple
 
-Install the necessary dependencies (only needs to be done once):
+  Install the necessary dependencies (only needs to be done once):
 
-npm install
+    npm install
 
 2. Start the Backend Server:
 
-Make sure your MongoDB server is running.
+  Make sure your MongoDB server is running.
 
-In the same terminal (inside backend_simple), run:
+  In the same terminal (inside backend_simple), run:
 
-node server.js
+    node server.js
 
-You should see messages indicating the server is running and connected to MongoDB (e.g., Simple backend server running at http://localhost:8080).
+  You should see messages indicating the server is running and connected to MongoDB (e.g., Simple backend server running at http://localhost:8080).
 
-Keep this terminal open.
+  Keep this terminal open.
 
 3. Run the Frontend:
 
-Navigate to the frontend_simple directory in your file explorer.
+  Navigate to the frontend_simple directory in your file explorer.
 
-Double-click the index.html file (or right-click and "Open with" your preferred browser).
+  Double-click the index.html file (or right-click and "Open with" your preferred browser).
 
-The application should now open in your browser and connect to the running backend.
+  The application should now open in your browser and connect to the running backend.
 
 
 **Important Notes**
@@ -92,5 +99,6 @@ The application should now open in your browser and connect to the running backe
 Security: This version is highly simplified for learning purposes. It does not implement secure password hashing or session management. Passwords are stored and compared in plain text. Do not use this for any real-world application.
 
 Email Sending: This version does not actually send emails when capsules are due. That functionality would need to be added to the backend (e.g., using a library like Nodemailer and a scheduled job runner).
+
 
 
