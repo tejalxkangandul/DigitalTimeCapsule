@@ -32,6 +32,7 @@ Other: cors Node.js package for handling Cross-Origin Resource Sharing.
 **File Structure**
 
 timeCapsule/
+
 ├── backend/ <-- Node.js Backend Code
 │ ├── node_modules/ <-- Installed dependencies (created by npm install)
 │ ├── package.json <-- Project definition and dependencies
@@ -91,4 +92,5 @@ The application should now open in your browser and connect to the running backe
 Security: This version is highly simplified for learning purposes. It does not implement secure password hashing or session management. Passwords are stored and compared in plain text. Do not use this for any real-world application.
 
 Email Sending: This version does not actually send emails when capsules are due. That functionality would need to be added to the backend (e.g., using a library like Nodemailer and a scheduled job runner).
+
 
